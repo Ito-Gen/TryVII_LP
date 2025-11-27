@@ -1,1 +1,904 @@
+import React, { useState, useEffect } from 'react';
+import {
+  Instagram,
+  Music,
+  Star,
+  Heart,
+  ExternalLink,
+  ChevronDown,
+  Menu,
+  X,
+  Sparkles,
+  Ticket,
+  Radio,
+  Calendar
+} from 'lucide-react';
 
+const TikTokIcon = ({ className = 'w-5 h-5' }) => (
+  <svg
+    viewBox="0 0 48 48"
+    aria-hidden="true"
+    className={className}
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M42 16.2c-3.4.1-6.6-1.1-9.1-3.4V29c0 7.7-6.3 14-14 14S4.9 36.7 4.9 29 11.2 15 18.9 15c1 0 2 .1 2.9.3v7.1a8.27 8.27 0 0 0-2.9-.5 7 7 0 1 0 7 7V2h7.1a12.8 12.8 0 0 0 12.6 12.3Z"
+      fill="currentColor"
+    />
+  </svg>
+);
+
+// Place hero + member photos under public/images/tryvii
+const IMAGE_ROOT = '/images/tryvii';
+const buildImagePath = (relativePath) => `${IMAGE_ROOT}/${relativePath}`;
+const memberPhoto = (fileName) => buildImagePath(`members/${fileName}`);
+const heroGroupPhoto = buildImagePath('group/TryVII_集合写真.jpg');
+
+const auraGradients = {
+  red: 'from-[#ff9eb5] via-[#ff6b8a] to-[#ffd5e1]',
+  blue: 'from-[#9ed7ff] via-[#5fa8ff] to-[#c7f2ff]',
+  cyan: 'from-[#b7f4ff] via-[#6dd5ff] to-[#e0fbff]',
+  purple: 'from-[#d5b9ff] via-[#a66bff] to-[#f0e4ff]',
+  yellow: 'from-[#ffe7a3] via-[#ffd35f] to-[#fff4ce]',
+  pink: 'from-[#ffc1f3] via-[#ff84d8] to-[#ffe6f8]',
+  white: 'from-[#f3f4f6] via-[#e5e7eb] to-[#ffffff]'
+};
+
+const MemberCard = ({ member }) => (
+  <div className="relative group overflow-hidden rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 bg-white border border-white/60 backdrop-blur-sm">
+    <div className={`absolute inset-0 bg-gradient-to-br ${auraGradients[member.aura]} opacity-70`}></div>
+    <div className="relative z-10 p-6 flex flex-col h-full">
+      <div className="flex justify-between items-center mb-4 text-xs font-semibold tracking-[0.25em] text-gray-600">
+        <span>{member.unit}</span>
+        <span className="text-gray-400">#{member.number}</span>
+      </div>
+      <div className="flex justify-center mb-5">
+        <div className={`w-32 h-32 rounded-full border-4 ${member.borderColor} bg-white overflow-hidden flex items-center justify-center text-4xl shadow-lg group-hover:scale-105 transition-all duration-300`}>
+          {member.image ? (
+            <img src={member.image} alt={member.name} className="w-full h-full object-cover" loading="lazy" />
+          ) : (
+            member.emoji
+          )}
+        </div>
+      </div>
+      <h3 className="text-2xl font-black text-center text-gray-900 mb-1 tracking-tight">{member.name}</h3>
+      <p className="text-xs text-center text-gray-600 mb-4 font-semibold tracking-[0.35em]">{member.romaji}</p>
+      <p className="text-center text-sm text-gray-700 font-medium mb-6">{member.signature}</p>
+
+      <div className="grid grid-cols-2 gap-3 text-xs text-gray-600 mb-6">
+        <div className="bg-white/80 rounded-2xl p-3 shadow-inner">
+          <span className="font-bold text-gray-400 block text-[0.65rem]">BIRTHDAY</span>
+          <span className="text-sm">{member.birthday}</span>
+        </div>
+        <div className="bg-white/80 rounded-2xl p-3 shadow-inner">
+          <span className="font-bold text-gray-400 block text-[0.65rem]">COLOR</span>
+          <span className={`text-sm font-bold ${member.textColor}`}>{member.colorName}</span>
+        </div>
+      </div>
+
+      <div className="mt-auto space-y-3">
+        <a
+          href={`#${member.slug}`}
+          className="flex items-center justify-center gap-2 w-full py-2 rounded-full bg-white/90 text-gray-900 font-bold text-sm shadow hover:bg-white transition"
+        >
+          <Sparkles className="w-4 h-4" />
+          PROFILE
+        </a>
+        <a
+          href={member.tiktok}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={`flex items-center justify-center gap-2 w-full py-2 rounded-full text-white ${member.btnColor} hover:opacity-80 transition-opacity shadow-lg font-bold text-sm`}
+        >
+          <TikTokIcon className="w-4 h-4" />
+          TikTok
+        </a>
+      </div>
+    </div>
+  </div>
+);
+
+const MemberProfile = ({ member }) => (
+  <section id={member.slug} className="relative rounded-[40px] overflow-hidden bg-white shadow-2xl border border-white/70">
+    <div className={`absolute inset-0 opacity-40 bg-gradient-to-br ${auraGradients[member.aura]}`}></div>
+    <div className="relative z-10 grid md:grid-cols-2 gap-10 p-10">
+      <div className="flex flex-col justify-center">
+        <span className="text-xs font-semibold tracking-[0.35em] text-gray-500 mb-2">TRYVII MEMBER #{member.number}</span>
+        <h3 className="text-4xl md:text-5xl font-black tracking-tight text-gray-900 mb-3">{member.name}</h3>
+        <p className="text-sm md:text-base text-gray-600 font-semibold tracking-[0.35em] mb-6">{member.romaji}</p>
+        <p className="text-gray-700 leading-relaxed mb-6">{member.profile}</p>
+        <div className="grid sm:grid-cols-2 gap-4 text-sm">
+          <div className="bg-white/80 rounded-2xl p-4 shadow-inner">
+            <p className="text-xs font-bold text-gray-400">SPECIALTY</p>
+            <p className="font-semibold text-gray-900">{member.specialty}</p>
+          </div>
+          <div className="bg-white/80 rounded-2xl p-4 shadow-inner">
+            <p className="text-xs font-bold text-gray-400">FAVORITE</p>
+            <p className="font-semibold text-gray-900">{member.favorite}</p>
+          </div>
+          <div className="bg-white/80 rounded-2xl p-4 shadow-inner">
+            <p className="text-xs font-bold text-gray-400">CHARM POINT</p>
+            <p className="font-semibold text-gray-900">{member.charm}</p>
+          </div>
+          <div className="bg-white/80 rounded-2xl p-4 shadow-inner">
+            <p className="text-xs font-bold text-gray-400">DREAM</p>
+            <p className="font-semibold text-gray-900">{member.dream}</p>
+          </div>
+        </div>
+        <div className="flex flex-wrap gap-3 mt-8">
+          {member.hashtags.map((tag) => (
+            <span key={tag} className="px-4 py-1 rounded-full bg-white/90 text-xs font-bold text-gray-600 shadow-sm">
+              {tag}
+            </span>
+          ))}
+        </div>
+        <div className="flex gap-4 mt-8 flex-wrap">
+          <a
+            href={member.tiktok}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`flex items-center gap-2 px-6 py-3 rounded-full text-white ${member.btnColor} font-bold shadow-lg`}
+          >
+            <TikTokIcon className="w-5 h-5" />
+            Follow on TikTok
+          </a>
+          <a
+            href="#audition"
+            className="flex items-center gap-2 px-6 py-3 rounded-full border-2 border-white/80 bg-white/70 text-gray-900 font-bold shadow"
+          >
+            <Sparkles className="w-5 h-5" />
+            Cheer Squad
+          </a>
+        </div>
+      </div>
+      <div className="space-y-6">
+        <div className="relative rounded-[32px] overflow-hidden border-4 border-white shadow-xl min-h-[320px]">
+          {member.image ? (
+            <>
+              <img
+                src={member.image}
+                alt={`${member.name} visual`}
+                className="w-full h-full object-cover"
+                loading="lazy"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+              <div className="absolute bottom-5 left-6 right-6 text-white flex items-center justify-between">
+                <div>
+                  <p className="text-xs tracking-[0.4em] text-white/70">STAGE ENERGY</p>
+                  <p className="text-3xl font-black">{member.stageMood}</p>
+                </div>
+                <div className="flex items-center gap-2 text-white/70 text-sm">
+                  <Music className="w-5 h-5" />
+                  Live Visual
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="w-full h-full flex flex-col items-center justify-center bg-white/80 text-gray-400">
+              <span className="text-6xl mb-3">{member.emoji}</span>
+              <p className="tracking-[0.3em] text-xs">PHOTO COMING SOON</p>
+            </div>
+          )}
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2">
+          {member.features.map((feature) => (
+            <div key={feature.title} className="p-4 bg-white rounded-2xl shadow-sm border border-gray-100">
+              <p className="text-xs font-bold text-gray-400">{feature.title}</p>
+              <p className="text-gray-800 font-semibold">{feature.detail}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+);
+
+const PortalLinkCard = ({ portal }) => (
+  <a
+    href={portal.href}
+    className="group relative overflow-hidden rounded-3xl bg-gray-900 text-white p-8 flex flex-col gap-6 hover:-translate-y-1 transition"
+  >
+    <portal.icon className="w-10 h-10 text-white/80" />
+    <div>
+      <h4 className="text-2xl font-black mb-3">{portal.title}</h4>
+      <p className="text-sm text-white/80 leading-relaxed">{portal.text}</p>
+    </div>
+    <div className="flex items-center gap-3 text-sm font-bold tracking-[0.3em]">
+      <span>{portal.action}</span>
+      <ChevronDown className="w-4 h-4 rotate-[-90deg] group-hover:translate-x-1 transition" />
+    </div>
+    <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition bg-gradient-to-br from-pink-500 via-purple-500 to-blue-500"></div>
+  </a>
+);
+
+const SectionTitle = ({ en, jp, subtitle }) => (
+  <div className="text-center mb-16">
+    <p className="text-xs font-semibold tracking-[0.35em] text-gray-400 mb-3">{jp}</p>
+    <h2 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 tracking-tighter mb-4">
+      {en}
+    </h2>
+    {subtitle && <p className="text-gray-500 max-w-2xl mx-auto">{subtitle}</p>}
+    <div className="w-16 h-1 bg-gradient-to-r from-pink-500 to-blue-500 mx-auto mt-6 rounded-full"></div>
+  </div>
+);
+
+const GlowStat = ({ stat }) => (
+  <div className="relative overflow-hidden rounded-3xl bg-white/80 shadow-lg border border-white/70 p-6">
+    <div className={`absolute inset-0 opacity-60 bg-gradient-to-br ${stat.accent}`}></div>
+    <div className="relative z-10">
+      <p className="text-xs font-bold tracking-[0.35em] text-gray-500 mb-2">{stat.label}</p>
+      <p className="text-3xl font-black text-gray-900 mb-2">{stat.value}</p>
+      <p className="text-sm text-gray-700">{stat.detail}</p>
+    </div>
+  </div>
+);
+
+export default function TryVII_LP() {
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setIsScrolled(window.scrollY > 50);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const members = [
+    {
+      number: '01',
+      unit: 'CRIMSON BLOOM',
+      name: '佐々木 梨華',
+      romaji: 'SASAKI RIKA',
+      birthday: '10/5',
+      colorName: 'RED',
+      borderColor: 'border-red-500',
+      textColor: 'text-red-500',
+      btnColor: 'bg-red-500',
+      aura: 'red',
+      emoji: '🌹',
+      slug: 'rika',
+      signature: '情熱のローズクイーン',
+      profile: 'TikTokオーディションで圧倒的な存在感を放ったセンター候補。クラシックバレエ仕込みのラインと情熱的な歌声で、観客の心を一瞬で掴む。',
+      specialty: 'ローズステップ&ターン',
+      favorite: '赤いリップと深夜の練習室',
+      charm: '鋭い眼差しとバレエ仕込みの指先',
+      dream: 'アリーナでのローズレイン演出',
+      stageMood: 'Fiery Bloom',
+      features: [
+        { title: 'VOICE', detail: '艶やかなハイトーンで感情を届ける' },
+        { title: 'AURA', detail: 'エモーショナルリードを務める求心力' },
+        { title: 'STYLE', detail: '赤×ゴールドのエレガンス' }
+      ],
+      hashtags: ['#RikaBloom', '#TryVII', '#CrimsonLead'],
+      tiktok: 'https://www.tiktok.com/@a______y03',
+      image: memberPhoto('佐々木 梨華.jpg')
+    },
+    {
+      number: '02',
+      unit: 'NEON WAVE',
+      name: '成宮 るる',
+      romaji: 'NARIMIYA RURU',
+      birthday: '10/22',
+      colorName: 'BLUE',
+      borderColor: 'border-blue-600',
+      textColor: 'text-blue-600',
+      btnColor: 'bg-blue-600',
+      aura: 'blue',
+      emoji: '🐬',
+      slug: 'ruru',
+      signature: '碧い波動のメロウヴォイス',
+      profile: '爽やかな歌声と予測不能なトークで人気急上昇中。波のように変化するダイナミックなダンスラインでステージを彩る。',
+      specialty: 'ウォータートリル',
+      favorite: '港での夜散歩',
+      charm: '伸びやかなハイトーンとキラとした瞳',
+      dream: '世界の海を巡るワールドツアー',
+      stageMood: 'Ocean Pulse',
+      features: [
+        { title: 'VOICE', detail: '透き通るエアリーな中音域' },
+        { title: 'TALK', detail: 'MCで客席を波に乗せる' },
+        { title: 'STYLE', detail: 'マリンモチーフのアクセント' }
+      ],
+      hashtags: ['#RuruWave', '#NeonBlue', '#TryVII'],
+      tiktok: 'https://www.tiktok.com/@r.r.r.r.r.r.n',
+      image: memberPhoto('成宮 るる.jpg')
+    },
+    {
+      number: '03',
+      unit: 'SKY LULLABY',
+      name: '桜叶 さら',
+      romaji: 'SAKURAKANA SARA',
+      birthday: '3/24',
+      colorName: 'LIGHT BLUE',
+      borderColor: 'border-cyan-400',
+      textColor: 'text-cyan-400',
+      btnColor: 'bg-cyan-400',
+      aura: 'cyan',
+      emoji: '☁️',
+      slug: 'sara',
+      signature: '空色ドリーマーの癒しボイス',
+      profile: 'ふわっとした佇まいからは想像できない集中力で、繊細なハーモニーを紡ぐムードメーカー。',
+      specialty: '雲歩きフォーメーション',
+      favorite: '雲の写真を撮ること',
+      charm: 'ウィンクで空気を柔らかくする魔法',
+      dream: '世界中の空を背景に歌うライブ',
+      stageMood: 'Cloud Serenade',
+      features: [
+        { title: 'VOICE', detail: '透明感のあるコーラス設計' },
+        { title: 'AURA', detail: '癒しのMCで場をふんわり包む' },
+        { title: 'STYLE', detail: 'エアリー素材×パステル' }
+      ],
+      hashtags: ['#SaraSky', '#CloudyMood', '#TryVII'],
+      tiktok: 'https://www.tiktok.com/@s024ra',
+      image: memberPhoto('桜叶 さら.jpg')
+    },
+    {
+      number: '04',
+      unit: 'MYSTIC VIOLET',
+      name: '姫河 未悠',
+      romaji: 'HIMEKAWA MIYU',
+      birthday: '4/27',
+      colorName: 'PURPLE',
+      borderColor: 'border-purple-500',
+      textColor: 'text-purple-500',
+      btnColor: 'bg-purple-500',
+      aura: 'purple',
+      emoji: '🦄',
+      slug: 'miyu',
+      signature: '幻想ユニコーンボイス',
+      profile: '独創的な世界観で楽曲の物語性を深めるビジュアルメイカー。ファッションへのこだわりも群を抜く。',
+      specialty: 'フェアリートーン',
+      favorite: 'ヴィンテージアクセ',
+      charm: '左右で違う瞳のきらめき',
+      dream: '自身演出のコンセプトライブ',
+      stageMood: 'Mystic Prism',
+      features: [
+        { title: 'VOICE', detail: 'ファルセットで空気を変える' },
+        { title: 'CREATION', detail: 'ステージ衣装のアップデート提案' },
+        { title: 'STYLE', detail: 'パープル×ユニコーンモチーフ' }
+      ],
+      hashtags: ['#MiyuMystic', '#VioletDream', '#TryVII'],
+      tiktok: 'https://www.tiktok.com/@min.k24',
+      image: memberPhoto('姫河 未悠.jpg')
+    },
+    {
+      number: '05',
+      unit: 'SUNNY BEATS',
+      name: '星咲 のんの',
+      romaji: 'HOSHISAKI NONNO',
+      birthday: '6/1',
+      colorName: 'YELLOW',
+      borderColor: 'border-yellow-400',
+      textColor: 'text-yellow-500',
+      btnColor: 'bg-yellow-400',
+      aura: 'yellow',
+      emoji: '🌻',
+      slug: 'nonno',
+      signature: '太陽級スマイルエナジー',
+      profile: 'いつでもハイテンションで現場を照らすムードブースター。TikTokではダンストレンドの火付け役としても活躍。',
+      specialty: 'サニーシャイン',
+      favorite: '甘いカフェラテ',
+      charm: '笑った時のえくぼ',
+      dream: '全国の小学校体育館ライブツアー',
+      stageMood: 'Solar Groove',
+      features: [
+        { title: 'VOICE', detail: 'ハッピーコーラスで彩る' },
+        { title: 'DANCE', detail: 'ハイテンポなシンクロダンス' },
+        { title: 'STYLE', detail: 'ポップ×Y2K小物' }
+      ],
+      hashtags: ['#NonnoSun', '#YellowSmile', '#TryVII'],
+      tiktok: 'https://www.tiktok.com/@nonno.0701',
+      image: memberPhoto('星咲 のんの.jpg')
+    },
+    {
+      number: '06',
+      unit: 'PINK CHRONICLE',
+      name: '古山 菜々美',
+      romaji: 'FURUYAMA NANAMI',
+      birthday: '7/26',
+      colorName: 'PINK',
+      borderColor: 'border-pink-400',
+      textColor: 'text-pink-400',
+      btnColor: 'bg-pink-400',
+      aura: 'pink',
+      emoji: '🎀',
+      slug: 'nanami',
+      signature: 'ストーリーテラーのシネマティックピンク',
+      profile: '表情芝居と語りで曲の背景を描き出すストーリーテラー。動画編集も得意で、グループのTikTokを支える影の監督。',
+      specialty: 'ドラマティックリップシンク',
+      favorite: 'フィルムカメラ収集',
+      charm: '瞬時に変わる表情筋',
+      dream: '自作脚本でミュージカル主演',
+      stageMood: 'Pink Narrative',
+      features: [
+        { title: 'VOICE', detail: '語りかけるような中低音' },
+        { title: 'CREATIVE', detail: 'MVの絵コンテ制作' },
+        { title: 'STYLE', detail: 'ピンク×クラシカルドレス' }
+      ],
+      hashtags: ['#NanamiFilm', '#PinkStory', '#TryVII'],
+      tiktok: 'https://www.tiktok.com/@nanacon.26',
+      image: memberPhoto('古山 菜々美.jpg')
+    },
+    {
+      number: '07',
+      unit: 'LUNAR SILK',
+      name: '楠 つきみ',
+      romaji: 'KUSUNOKI TSUKIMI',
+      birthday: '9/10',
+      colorName: 'WHITE',
+      borderColor: 'border-gray-300',
+      textColor: 'text-gray-500',
+      btnColor: 'bg-gray-500',
+      aura: 'white',
+      emoji: '🌙',
+      slug: 'tsukimi',
+      signature: '月光センセーション',
+      profile: '静かながらも核を持つパフォーマンスでファンを魅了。気配り上手でメンバーを包み込む「夜のリーダー」。',
+      specialty: 'ムーンビート',
+      favorite: '夜明け前の空気',
+      charm: 'ミステリアスな横顔シルエット',
+      dream: '月面ライブをARで再現',
+      stageMood: 'Lunar Drift',
+      features: [
+        { title: 'VOICE', detail: '低音で曲に奥行きを与える' },
+        { title: 'DIRECTION', detail: 'ステージングの最終整合' },
+        { title: 'STYLE', detail: 'ホワイト×シルバーフリル' }
+      ],
+      hashtags: ['#TsukimiMoon', '#LunarSilk', '#TryVII'],
+      tiktok: 'https://www.tiktok.com/@tamaconnyapi',
+      image: memberPhoto('楠 つきみ.jpg')
+    }
+  ];
+
+  const glowStats = [
+    { label: 'TIKTOK FOLLOWERS', value: '1.2M+', detail: 'デビュー前から世界中のファンが注目', accent: 'from-pink-200 via-purple-200 to-blue-200' },
+    { label: 'LIVE DIAMONDS', value: '1,000,000', detail: 'TikTok LIVEで達成したデビューミッション', accent: 'from-purple-200 via-blue-200 to-cyan-200' },
+    { label: 'DAILY STREAMS', value: '450K', detail: 'ティザー楽曲の1日平均再生数', accent: 'from-yellow-200 via-pink-100 to-white' },
+    { label: 'GLOBAL FANS', value: '38', detail: '応援コメントが届いた国と地域数', accent: 'from-blue-100 via-cyan-100 to-purple-100' }
+  ];
+
+  const scheduleData = [
+    { date: '2025.11.25', day: 'TUE', title: 'TikTok LIVE 定期配信 - Shooting Star Session', cat: 'LIVE', color: 'bg-red-500' },
+    { date: '2025.12.01', day: 'FRI', title: 'デビュー記念ファンミーティング in Tokyo', cat: 'EVENT', color: 'bg-blue-500' },
+    { date: '2025.12.15', day: 'FRI', title: '新曲「Victory Seven」MV公開', cat: 'RELEASE', color: 'bg-purple-500' },
+    { date: '2025.12.24', day: 'TUE', title: 'クリスマス特別ライブ配信「TryVII Noel」', cat: 'LIVE', color: 'bg-red-500' }
+  ];
+
+  const discography = [
+    { title: 'Victory Seven', type: 'Debut Single', release: '2025.02.07', mood: 'Anthem / Dance Pop' },
+    { title: 'Moonlit Try', type: 'Pre-Debut Digital Track', release: '2024.12.20', mood: 'Future R&B' },
+    { title: 'Parallel Bloom', type: 'TikTok Teaser', release: '2024.11.30', mood: 'Hyper Pop' }
+  ];
+
+  const portalLinks = [
+    {
+      id: 'discography',
+      title: 'Discography',
+      text: 'デビュー曲やティザー音源を最速チェック。ハイレゾ配信リンクも順次追加予定。',
+      action: 'VIEW RELEASES',
+      href: '#discography',
+      icon: Music
+    },
+    {
+      id: 'fanclub',
+      title: 'Fan Club',
+      text: 'TryVII OFFICIAL FANBASE「TRYLIGHT」への加入予約。限定コンテンツや先行申込をお届け。',
+      action: 'JOIN WAITLIST',
+      href: '#fanclub',
+      icon: Heart
+    },
+    {
+      id: 'audition',
+      title: 'Audition',
+      text: '研究生・サポートクリエイターの募集情報。挑戦を恐れない仲間を常に求めています。',
+      action: 'APPLY NOW',
+      href: '#audition',
+      icon: Ticket
+    }
+  ];
+
+  const nextEvent = scheduleData[0];
+
+  return (
+    <div className="font-['Poppins','Noto Sans JP',sans-serif] text-gray-800 bg-gradient-to-b from-[#fef6ff] via-[#f2f7ff] to-white min-h-screen selection:bg-pink-200">
+      {/* Navigation */}
+      <nav className={`fixed w-full z-50 transition-all duration-300 ${
+        isScrolled ? 'bg-white/90 backdrop-blur-2xl shadow-lg py-3' : 'bg-transparent py-6'
+      }`}>
+        <div className="max-w-6xl mx-auto px-6 flex justify-between items-center">
+          <div className="text-2xl font-black tracking-tighter bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 bg-clip-text text-transparent cursor-pointer">
+            TryVII
+          </div>
+          <div className="hidden md:flex space-x-6 font-bold text-xs tracking-[0.35em] text-gray-600">
+            <a href="#about" className="hover:text-pink-500 transition-colors">ABOUT</a>
+            <a href="#members" className="hover:text-pink-500 transition-colors">MEMBERS</a>
+            <a href="#spotlight" className="hover:text-pink-500 transition-colors">PROFILE</a>
+            <a href="#schedule" className="hover:text-pink-500 transition-colors">SCHEDULE</a>
+            <a href="#discography" className="hover:text-pink-500 transition-colors">DISCO</a>
+            <a href="#fanclub" className="hover:text-pink-500 transition-colors">FANCLUB</a>
+            <a href="#audition" className="hover:text-pink-500 transition-colors">AUDITION</a>
+            <a href="#contact" className="hover:text-pink-500 transition-colors">CONTACT</a>
+          </div>
+          <div className="md:hidden">
+            <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-gray-700 focus:outline-none">
+              {isMenuOpen ? <X /> : <Menu />}
+            </button>
+          </div>
+        </div>
+        {isMenuOpen && (
+          <div className="md:hidden absolute top-full left-0 w-full bg-white shadow-lg py-4 flex flex-col items-center space-y-4 font-bold text-gray-600 tracking-[0.35em] text-xs">
+            {['about','members','spotlight','schedule','discography','fanclub','audition','contact'].map((item) => (
+              <a key={item} href={`#${item}`} onClick={() => setIsMenuOpen(false)}>
+                {item.toUpperCase()}
+              </a>
+            ))}
+          </div>
+        )}
+      </nav>
+
+      {/* Hero */}
+      <header className="relative min-h-screen flex items-center overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0c0119] via-[#120a33] to-[#040108]"></div>
+        <div className="absolute inset-0 opacity-40">
+          <div className="absolute w-[500px] h-[500px] bg-pink-500/40 rounded-full blur-3xl top-1/4 left-1/5 animate-blob"></div>
+          <div className="absolute w-[520px] h-[520px] bg-purple-500/40 rounded-full blur-3xl bottom-1/4 right-1/5 animate-blob animation-delay-2000"></div>
+          <div className="absolute inset-0 bg-[radial-gradient(circle,_rgba(255,255,255,0.1)_0%,_transparent_65%)]"></div>
+        </div>
+        <div className="absolute inset-0 pointer-events-none">
+          {[...Array(30)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute w-1 h-1 bg-white rounded-full animate-pulse"
+              style={{
+                top: `${Math.random() * 100}%`,
+                left: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 5}s`
+              }}
+            ></div>
+          ))}
+        </div>
+        <div className="relative z-10 w-full">
+          <div className="max-w-6xl mx-auto px-6 grid lg:grid-cols-[1.05fr_0.95fr] gap-12 items-center">
+            <div className="text-center lg:text-left">
+              <div className="flex items-center justify-center lg:justify-start gap-3 text-white/70 text-xs font-semibold tracking-[0.6em] mb-6">
+                <Radio className="w-4 h-4" />
+                TIKTOK ORIGIN IDOL PROJECT
+              </div>
+              <h1 className="text-5xl md:text-8xl font-black text-white mb-4 tracking-tight drop-shadow-2xl">
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-pink-200 via-white to-blue-200">TryVII</span>
+              </h1>
+              <p className="text-white text-lg md:text-2xl font-semibold tracking-[0.35em]">TRY TOGETHER, WIN AS VII</p>
+              <p className="text-white/80 text-sm md:text-base mt-6 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
+                TikTok発、７色の挑戦。世界へ飛び出すデジタルネイティブアイドルがここに誕生。
+              </p>
+              {nextEvent && (
+                <div className="mt-6 inline-flex items-center gap-3 px-5 py-3 rounded-full bg-white/10 text-white/80 text-xs font-semibold tracking-[0.3em] border border-white/20">
+                  <Calendar className="w-4 h-4" />
+                  NEXT LIVE {nextEvent.date} ({nextEvent.day})
+                </div>
+              )}
+              <div className="flex flex-wrap justify-center lg:justify-start gap-4 mt-10">
+                <a
+                  href="https://www.tiktok.com/@tryvii_official"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-8 py-3 rounded-full bg-gradient-to-r from-pink-500 to-blue-500 text-white font-bold flex items-center gap-2 shadow-xl"
+                >
+                  <TikTokIcon className="w-5 h-5" />
+                  Follow Group TikTok
+                </a>
+                <a
+                  href="#members"
+                  className="px-8 py-3 rounded-full bg-white/20 text-white font-bold border border-white/40 backdrop-blur-sm"
+                >
+                  Meet The Members
+                </a>
+              </div>
+              <div className="mt-16 hidden lg:flex items-center gap-2 text-white/60 text-xs tracking-[0.35em]">
+                <Sparkles className="w-4 h-4" />
+                2025.02 DEBUT VISUAL FIRST CUT
+              </div>
+            </div>
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-pink-500/30 to-blue-500/30 blur-3xl"></div>
+              <div className="relative rounded-[40px] overflow-hidden border border-white/20 shadow-2xl">
+                <img
+                  src={heroGroupPhoto}
+                  alt="TryVII 集合写真"
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
+                <div className="absolute bottom-5 left-6 right-6 text-white flex items-center justify-between text-xs tracking-[0.35em]">
+                  <span>TRYVII FIRST VIEW</span>
+                  <span>2025 VISUAL</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="mt-12 animate-bounce">
+            <ChevronDown className="text-white/50 mx-auto w-10 h-10" />
+          </div>
+        </div>
+      </header>
+
+      {/* Glow Stats */}
+      <section className="py-24" id="about">
+        <div className="max-w-6xl mx-auto px-6">
+          <SectionTitle en="WHO WE ARE" jp="TRYVIIについて" subtitle="挑戦と勝利をミッションに掲げるTikTok発の7人組。ファンと共に進化するハイブリッドアイドルグループ。" />
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {glowStats.map((stat) => (
+              <GlowStat key={stat.label} stat={stat} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Concept */}
+      <section className="py-16 bg-white">
+        <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-10">
+          <div className="bg-gradient-to-br from-[#fff0f4] to-[#f0f4ff] p-10 rounded-[36px] shadow-lg border border-white/70">
+            <h3 className="text-2xl font-black text-gray-900 mb-4 flex items-center gap-3">
+              <Star className="text-yellow-400" />
+              Concept
+            </h3>
+            <p className="text-gray-700 leading-relaxed mb-6">
+              Try(挑戦) + VII(7人)。7人それぞれの挑戦心とデジタルクリエイティビティを掛け合わせ、常にアップデートするアイドル像を提示します。TikTok LIVEでのダイヤ獲得という過酷なミッションを達成し、デビューの扉を開いた７人です。
+            </p>
+            <div className="flex items-center gap-4 text-sm font-semibold text-gray-500">
+              <Music size={18} />
+              TikTok LIVE Debut Mission ➜ 1,000,000 Diamonds CLEAR
+            </div>
+          </div>
+          <div className="space-y-6">
+            <div className="p-6 rounded-3xl bg-white shadow border-l-4 border-pink-400">
+              <p className="text-xs font-bold text-gray-400">TRY</p>
+              <h4 className="text-xl font-black text-gray-900 mb-2">挑戦する心</h4>
+              <p className="text-gray-600">ファンと共にトレンドを創り、結果で証明する</p>
+            </div>
+            <div className="p-6 rounded-3xl bg-white shadow border-l-4 border-purple-500">
+              <p className="text-xs font-bold text-gray-400">VII</p>
+              <h4 className="text-xl font-black text-gray-900 mb-2">7人の絆</h4>
+              <p className="text-gray-600">個性と色を尊重しながら一つの勝利を目指す</p>
+            </div>
+            <div className="p-6 rounded-3xl bg-white shadow border-l-4 border-blue-500">
+              <p className="text-xs font-bold text-gray-400">FUTURE</p>
+              <h4 className="text-xl font-black text-gray-900 mb-2">ハイブリッド表現</h4>
+              <p className="text-gray-600">ライブとデジタルコンテンツを行き来する次世代体験</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Members Grid */}
+      <section id="members" className="py-24 bg-[#fdf8ff]">
+        <div className="max-w-6xl mx-auto px-6">
+          <SectionTitle en="MEMBERS" jp="メンバー紹介" subtitle="あなたの推しカラーを見つけて。" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {members.map((member) => (
+              <MemberCard key={member.slug} member={member} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Spotlight Profiles */}
+      <section id="spotlight" className="py-24 bg-gradient-to-b from-white to-[#f1f5ff]">
+        <div className="max-w-6xl mx-auto px-6 space-y-12">
+          <SectionTitle en="MEMBER PAGES" jp="個別プロフィール" subtitle="推しの魅力をもっと深く。各メンバーのページで特徴をチェック。" />
+          <div className="space-y-12">
+            {members.map((member) => (
+              <MemberProfile key={member.slug} member={member} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Schedule */}
+      <section id="schedule" className="py-24 bg-white">
+        <div className="max-w-5xl mx-auto px-6">
+          <SectionTitle en="SCHEDULE" jp="スケジュール" subtitle="TikTokを中心にリアルとオンラインで展開中" />
+          <div className="space-y-4">
+            {scheduleData.map((item) => (
+              <div key={item.date} className="flex flex-col md:flex-row items-start md:items-center gap-4 p-6 bg-gray-50 rounded-3xl hover:bg-white transition border border-gray-100">
+                <div className="flex items-center gap-3 min-w-[160px]">
+                  <div className={`text-xs text-white px-2 py-1 rounded font-bold ${item.color}`}>{item.cat}</div>
+                  <span className="font-bold text-gray-800 font-mono">{item.date}</span>
+                  <span className="text-xs text-gray-400">({item.day})</span>
+                </div>
+                <div className="flex-grow font-semibold text-gray-800">
+                  {item.title}
+                </div>
+                <ExternalLink size={16} className="text-gray-400" />
+              </div>
+            ))}
+          </div>
+          <div className="text-center mt-10">
+            <a
+              href="https://www.tiktok.com/@tryvii_official"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-8 py-3 rounded-full border-2 border-gray-900 text-gray-900 font-bold hover:bg-gray-900 hover:text-white transition"
+            >
+              TikTokで最新配信を見る
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* Discography */}
+      <section id="discography" className="py-24 bg-[#050014] text-white relative overflow-hidden">
+        <div className="absolute inset-0 opacity-30 bg-[radial-gradient(circle,_rgba(255,255,255,0.2)_0%,_transparent_60%)]"></div>
+        <div className="max-w-5xl mx-auto px-6 relative z-10">
+          <SectionTitle en="DISCOGRAPHY" jp="音源情報" subtitle="デビューに向けてアップロードされる音源を先出しチェック" />
+          <div className="space-y-6">
+            {discography.map((item) => (
+              <div key={item.title} className="p-6 rounded-3xl bg-white/5 border border-white/10 backdrop-blur">
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                  <div>
+                    <p className="text-xs tracking-[0.4em] text-white/60 mb-2">{item.type}</p>
+                    <h4 className="text-2xl font-black">{item.title}</h4>
+                    <p className="text-sm text-white/70">Mood: {item.mood}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-white/60 text-sm">Release</p>
+                    <p className="text-xl font-bold">{item.release}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Portal Links */}
+      <section className="py-24 bg-white">
+        <div className="max-w-6xl mx-auto px-6">
+          <SectionTitle en="PORTAL" jp="公式リンク" subtitle="ファンクラブやオーディションページなど、アイドルグループに欠かせない導線をまとめました。" />
+          <div className="grid md:grid-cols-3 gap-6">
+            {portalLinks.map((portal) => (
+              <PortalLinkCard key={portal.id} portal={portal} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Fanclub */}
+      <section id="fanclub" className="py-24 bg-gradient-to-r from-[#ffd5ef] via-[#f6f0ff] to-[#dff1ff]">
+        <div className="max-w-5xl mx-auto px-6 grid md:grid-cols-2 gap-10 items-center">
+          <div>
+            <p className="text-xs font-semibold tracking-[0.35em] text-gray-500 mb-4">FANCLUB</p>
+            <h3 className="text-4xl font-black text-gray-900 mb-4">TRYLIGHT</h3>
+            <p className="text-gray-700 mb-6">
+              会員限定TikTokライブ、未公開レッスン映像、先行チケットなどをお届けするTryVII公式ファンクラブ。現在プレ登録受付中！
+            </p>
+            <ul className="space-y-3 text-sm text-gray-700">
+              <li>・月一回のメンバー生配信アフタートーク</li>
+              <li>・会報デジタルマガジン「TRYLOG」</li>
+              <li>・バースデーサプライズ動画</li>
+            </ul>
+            <div className="flex gap-4 mt-8">
+              <a href="#contact" className="px-6 py-3 rounded-full bg-gray-900 text-white font-bold">Pre Register</a>
+              <a href="https://www.tiktok.com/@tryvii_official" className="px-6 py-3 rounded-full border border-gray-900 text-gray-900 font-bold">
+                Follow Updates
+              </a>
+            </div>
+          </div>
+          <div className="bg-white rounded-[40px] p-8 shadow-2xl border border-white/60">
+            <h4 className="text-2xl font-black mb-4">Member Perks</h4>
+            <div className="space-y-4">
+              <div className="p-4 rounded-2xl bg-gray-50">
+                <p className="text-xs font-bold text-gray-400">DIGITAL KIT</p>
+                <p className="font-semibold text-gray-800">限定待受・TikTokカバー素材</p>
+              </div>
+              <div className="p-4 rounded-2xl bg-gray-50">
+                <p className="text-xs font-bold text-gray-400">EVENT</p>
+                <p className="font-semibold text-gray-800">シークレットミート&グリート抽選</p>
+              </div>
+              <div className="p-4 rounded-2xl bg-gray-50">
+                <p className="text-xs font-bold text-gray-400">COMMUNITY</p>
+                <p className="font-semibold text-gray-800">TryVII Discord(準備中)</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Audition */}
+      <section id="audition" className="py-24 bg-[#050014] text-white">
+        <div className="max-w-5xl mx-auto px-6 grid md:grid-cols-2 gap-10 items-center">
+          <div>
+            <p className="text-xs tracking-[0.4em] text-white/60 mb-4">AUDITION</p>
+            <h3 className="text-4xl font-black mb-4">TRYVII LAB NEXT</h3>
+            <p className="text-white/80 mb-6">
+              新章に向けて、研究生およびステージ・クリエイター陣を募集。歌・ダンスだけでなく、映像編集、配信演出などクリエイティブスキルも歓迎です。
+            </p>
+            <ul className="space-y-3 text-sm text-white/70">
+              <li>・応募期間：2025.01.05 - 2025.02.05</li>
+              <li>・形式：オンライン審査 → TikTok LIVE課題</li>
+              <li>・募集パート：VOCAL / DANCE / CREATIVE CREW</li>
+            </ul>
+            <div className="flex gap-4 mt-8">
+              <a href="mailto:info@tryvii-official.com" className="px-6 py-3 rounded-full bg-white text-gray-900 font-bold">Entry Mail</a>
+              <a href="#contact" className="px-6 py-3 rounded-full border border-white text-white font-bold">More Info</a>
+            </div>
+          </div>
+          <div className="bg-white/5 rounded-[40px] p-8 border border-white/15 backdrop-blur">
+            <h4 className="text-2xl font-black mb-4">What We Seek</h4>
+            <div className="space-y-4 text-sm">
+              <div className="p-4 rounded-2xl bg-white/10">
+                <p className="text-white/60">CREATORS</p>
+                <p className="font-semibold">ショート動画演出・編集が得意な方</p>
+              </div>
+              <div className="p-4 rounded-2xl bg-white/10">
+                <p className="text-white/60">PERFORMERS</p>
+                <p className="font-semibold">個性的なカラーで勝負できる挑戦者</p>
+              </div>
+              <div className="p-4 rounded-2xl bg-white/10">
+                <p className="text-white/60">STAFF</p>
+                <p className="font-semibold">衣装・映像・配信の専門スタッフ</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer id="contact" className="bg-gray-950 text-white py-20">
+        <div className="max-w-6xl mx-auto px-6 text-center">
+          <h2 className="text-3xl font-black mb-8">TryVII Official</h2>
+          <div className="flex justify-center gap-6 mb-10">
+            <a
+              href="https://www.tiktok.com/@tryvii_official"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center hover:bg-pink-500 transition"
+            >
+              <TikTokIcon className="w-6 h-6" />
+            </a>
+            <a href="#" className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center hover:bg-gradient-to-tr from-purple-500 to-pink-500 transition">
+              <Instagram size={24} />
+            </a>
+            <a href="#discography" className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center hover:bg-white hover:text-gray-900 transition">
+              <Music size={24} />
+            </a>
+          </div>
+          <div className="grid md:grid-cols-3 gap-8 text-left text-sm text-white/80 max-w-4xl mx-auto mb-12 border-t border-white/10 pt-12">
+            <div>
+              <h4 className="text-white font-bold mb-3">CONTACT</h4>
+              <p>info@tryvii-official.com</p>
+              <p>出演依頼・タイアップのご相談はこちら</p>
+            </div>
+            <div>
+              <h4 className="text-white font-bold mb-3">LINKS</h4>
+              <ul className="space-y-2">
+                <li><a href="#discography" className="hover:text-white">Release Info</a></li>
+                <li><a href="#fanclub" className="hover:text-white">Fanclub</a></li>
+                <li><a href="#audition" className="hover:text-white">Audition</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-white font-bold mb-3">NEWSLETTER</h4>
+              <p className="mb-3">最新情報をメールで受け取る</p>
+              <button className="w-full px-4 py-2 rounded-full bg-white text-gray-900 font-bold">Notify Me</button>
+            </div>
+          </div>
+          <p className="text-xs text-white/50">© 2025 TryVII Official. All Rights Reserved.</p>
+        </div>
+      </footer>
+
+      <style>{`
+        @keyframes blob {
+          0% { transform: translate(0px, 0px) scale(1); }
+          33% { transform: translate(40px, -60px) scale(1.1); }
+          66% { transform: translate(-30px, 20px) scale(0.9); }
+          100% { transform: translate(0px, 0px) scale(1); }
+        }
+        .animate-blob {
+          animation: blob 8s infinite;
+        }
+        .animation-delay-2000 {
+          animation-delay: 2s;
+        }
+      `}</style>
+    </div>
+  );
+}
