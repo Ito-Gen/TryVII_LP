@@ -4,14 +4,14 @@ import {
   Music,
   Star,
   Heart,
-  Calendar,
   ExternalLink,
   ChevronDown,
   Menu,
   X,
   Sparkles,
   Ticket,
-  Radio
+  Radio,
+  Calendar
 } from 'lucide-react';
 
 const TikTokIcon = ({ className = 'w-5 h-5' }) => (
@@ -28,6 +28,12 @@ const TikTokIcon = ({ className = 'w-5 h-5' }) => (
   </svg>
 );
 
+// Place hero + member photos under public/images/tryvii
+const IMAGE_ROOT = '/images/tryvii';
+const buildImagePath = (relativePath) => `${IMAGE_ROOT}/${relativePath}`;
+const memberPhoto = (fileName) => buildImagePath(`members/${fileName}`);
+const heroGroupPhoto = buildImagePath('group/TryVII_集合写真.jpg');
+
 const auraGradients = {
   red: 'from-[#ff9eb5] via-[#ff6b8a] to-[#ffd5e1]',
   blue: 'from-[#9ed7ff] via-[#5fa8ff] to-[#c7f2ff]',
@@ -39,7 +45,7 @@ const auraGradients = {
 };
 
 const MemberCard = ({ member }) => (
-  <div className={`relative group overflow-hidden rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 bg-white border border-white/60 backdrop-blur-sm`}>
+  <div className="relative group overflow-hidden rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 bg-white border border-white/60 backdrop-blur-sm">
     <div className={`absolute inset-0 bg-gradient-to-br ${auraGradients[member.aura]} opacity-70`}></div>
     <div className="relative z-10 p-6 flex flex-col h-full">
       <div className="flex justify-between items-center mb-4 text-xs font-semibold tracking-[0.25em] text-gray-600">
@@ -47,9 +53,9 @@ const MemberCard = ({ member }) => (
         <span className="text-gray-400">#{member.number}</span>
       </div>
       <div className="flex justify-center mb-5">
-        <div className={`w-28 h-28 rounded-full border-4 ${member.borderColor} bg-white/70 overflow-hidden flex items-center justify-center text-4xl shadow-lg group-hover:scale-105 transition-transform duration-300`}>
+        <div className={`w-32 h-32 rounded-full border-4 ${member.borderColor} bg-white overflow-hidden flex items-center justify-center text-4xl shadow-lg group-hover:scale-105 transition-all duration-300`}>
           {member.image ? (
-            <img src={member.image} alt={member.name} className="w-full h-full object-cover" />
+            <img src={member.image} alt={member.name} className="w-full h-full object-cover" loading="lazy" />
           ) : (
             member.emoji
           )}
@@ -60,11 +66,11 @@ const MemberCard = ({ member }) => (
       <p className="text-center text-sm text-gray-700 font-medium mb-6">{member.signature}</p>
 
       <div className="grid grid-cols-2 gap-3 text-xs text-gray-600 mb-6">
-        <div className="bg-white/70 rounded-2xl p-3 shadow-inner">
+        <div className="bg-white/80 rounded-2xl p-3 shadow-inner">
           <span className="font-bold text-gray-400 block text-[0.65rem]">BIRTHDAY</span>
           <span className="text-sm">{member.birthday}</span>
         </div>
-        <div className="bg-white/70 rounded-2xl p-3 shadow-inner">
+        <div className="bg-white/80 rounded-2xl p-3 shadow-inner">
           <span className="font-bold text-gray-400 block text-[0.65rem]">COLOR</span>
           <span className={`text-sm font-bold ${member.textColor}`}>{member.colorName}</span>
         </div>
@@ -93,11 +99,8 @@ const MemberCard = ({ member }) => (
 );
 
 const MemberProfile = ({ member }) => (
-  <section
-    id={member.slug}
-    className="relative rounded-[40px] overflow-hidden bg-white shadow-2xl border border-white/70"
-  >
-    <div className={`absolute inset-0 opacity-50 bg-gradient-to-br ${auraGradients[member.aura]}`}></div>
+  <section id={member.slug} className="relative rounded-[40px] overflow-hidden bg-white shadow-2xl border border-white/70">
+    <div className={`absolute inset-0 opacity-40 bg-gradient-to-br ${auraGradients[member.aura]}`}></div>
     <div className="relative z-10 grid md:grid-cols-2 gap-10 p-10">
       <div className="flex flex-col justify-center">
         <span className="text-xs font-semibold tracking-[0.35em] text-gray-500 mb-2">TRYVII MEMBER #{member.number}</span>
@@ -105,31 +108,31 @@ const MemberProfile = ({ member }) => (
         <p className="text-sm md:text-base text-gray-600 font-semibold tracking-[0.35em] mb-6">{member.romaji}</p>
         <p className="text-gray-700 leading-relaxed mb-6">{member.profile}</p>
         <div className="grid sm:grid-cols-2 gap-4 text-sm">
-          <div className="bg-white/70 rounded-2xl p-4 shadow-inner">
+          <div className="bg-white/80 rounded-2xl p-4 shadow-inner">
             <p className="text-xs font-bold text-gray-400">SPECIALTY</p>
             <p className="font-semibold text-gray-900">{member.specialty}</p>
           </div>
-          <div className="bg-white/70 rounded-2xl p-4 shadow-inner">
+          <div className="bg-white/80 rounded-2xl p-4 shadow-inner">
             <p className="text-xs font-bold text-gray-400">FAVORITE</p>
             <p className="font-semibold text-gray-900">{member.favorite}</p>
           </div>
-          <div className="bg-white/70 rounded-2xl p-4 shadow-inner">
+          <div className="bg-white/80 rounded-2xl p-4 shadow-inner">
             <p className="text-xs font-bold text-gray-400">CHARM POINT</p>
             <p className="font-semibold text-gray-900">{member.charm}</p>
           </div>
-          <div className="bg-white/70 rounded-2xl p-4 shadow-inner">
+          <div className="bg-white/80 rounded-2xl p-4 shadow-inner">
             <p className="text-xs font-bold text-gray-400">DREAM</p>
             <p className="font-semibold text-gray-900">{member.dream}</p>
           </div>
         </div>
         <div className="flex flex-wrap gap-3 mt-8">
           {member.hashtags.map((tag) => (
-            <span key={tag} className="px-4 py-1 rounded-full bg-white/80 text-xs font-bold text-gray-600 shadow-sm">
+            <span key={tag} className="px-4 py-1 rounded-full bg-white/90 text-xs font-bold text-gray-600 shadow-sm">
               {tag}
             </span>
           ))}
         </div>
-        <div className="flex gap-4 mt-8">
+        <div className="flex gap-4 mt-8 flex-wrap">
           <a
             href={member.tiktok}
             target="_blank"
@@ -148,16 +151,36 @@ const MemberProfile = ({ member }) => (
           </a>
         </div>
       </div>
-      <div className="flex flex-col justify-between bg-white/80 rounded-[32px] p-6 shadow-xl">
-        <div className="relative h-72 rounded-[26px] overflow-hidden border-4 border-white shadow-inner">
-          <div className={`absolute inset-0 bg-gradient-to-br ${auraGradients[member.aura]} opacity-60`}></div>
-          <div className="relative z-10 h-full flex flex-col items-center justify-center text-center text-gray-900">
-            <span className="text-5xl mb-4">{member.emoji}</span>
-            <p className="font-bold tracking-[0.35em] text-xs text-gray-500">STAGE ENERGY</p>
-            <p className="text-4xl font-black">{member.stageMood}</p>
-          </div>
+      <div className="space-y-6">
+        <div className="relative rounded-[32px] overflow-hidden border-4 border-white shadow-xl min-h-[320px]">
+          {member.image ? (
+            <>
+              <img
+                src={member.image}
+                alt={`${member.name} visual`}
+                className="w-full h-full object-cover"
+                loading="lazy"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+              <div className="absolute bottom-5 left-6 right-6 text-white flex items-center justify-between">
+                <div>
+                  <p className="text-xs tracking-[0.4em] text-white/70">STAGE ENERGY</p>
+                  <p className="text-3xl font-black">{member.stageMood}</p>
+                </div>
+                <div className="flex items-center gap-2 text-white/70 text-sm">
+                  <Music className="w-5 h-5" />
+                  Live Visual
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="w-full h-full flex flex-col items-center justify-center bg-white/80 text-gray-400">
+              <span className="text-6xl mb-3">{member.emoji}</span>
+              <p className="tracking-[0.3em] text-xs">PHOTO COMING SOON</p>
+            </div>
+          )}
         </div>
-        <div className="mt-6 space-y-4">
+        <div className="grid gap-4 sm:grid-cols-2">
           {member.features.map((feature) => (
             <div key={feature.title} className="p-4 bg-white rounded-2xl shadow-sm border border-gray-100">
               <p className="text-xs font-bold text-gray-400">{feature.title}</p>
@@ -248,7 +271,7 @@ export default function TryVII_LP() {
       ],
       hashtags: ['#RikaBloom', '#TryVII', '#CrimsonLead'],
       tiktok: 'https://www.tiktok.com/@a______y03',
-      image: 'image_5c0700.png'
+      image: memberPhoto('佐々木 梨華.jpg')
     },
     {
       number: '02',
@@ -276,7 +299,8 @@ export default function TryVII_LP() {
         { title: 'STYLE', detail: 'マリンモチーフのアクセント' }
       ],
       hashtags: ['#RuruWave', '#NeonBlue', '#TryVII'],
-      tiktok: 'https://www.tiktok.com/@r.r.r.r.r.r.n'
+      tiktok: 'https://www.tiktok.com/@r.r.r.r.r.r.n',
+      image: memberPhoto('成宮 るる.jpg')
     },
     {
       number: '03',
@@ -304,7 +328,8 @@ export default function TryVII_LP() {
         { title: 'STYLE', detail: 'エアリー素材×パステル' }
       ],
       hashtags: ['#SaraSky', '#CloudyMood', '#TryVII'],
-      tiktok: 'https://www.tiktok.com/@s024ra'
+      tiktok: 'https://www.tiktok.com/@s024ra',
+      image: memberPhoto('桜叶 さら.jpg')
     },
     {
       number: '04',
@@ -332,7 +357,8 @@ export default function TryVII_LP() {
         { title: 'STYLE', detail: 'パープル×ユニコーンモチーフ' }
       ],
       hashtags: ['#MiyuMystic', '#VioletDream', '#TryVII'],
-      tiktok: 'https://www.tiktok.com/@min.k24'
+      tiktok: 'https://www.tiktok.com/@min.k24',
+      image: memberPhoto('姫河 未悠.jpg')
     },
     {
       number: '05',
@@ -360,7 +386,8 @@ export default function TryVII_LP() {
         { title: 'STYLE', detail: 'ポップ×Y2K小物' }
       ],
       hashtags: ['#NonnoSun', '#YellowSmile', '#TryVII'],
-      tiktok: 'https://www.tiktok.com/@nonno.0701'
+      tiktok: 'https://www.tiktok.com/@nonno.0701',
+      image: memberPhoto('星咲 のんの.jpg')
     },
     {
       number: '06',
@@ -388,7 +415,8 @@ export default function TryVII_LP() {
         { title: 'STYLE', detail: 'ピンク×クラシカルドレス' }
       ],
       hashtags: ['#NanamiFilm', '#PinkStory', '#TryVII'],
-      tiktok: 'https://www.tiktok.com/@nanacon.26'
+      tiktok: 'https://www.tiktok.com/@nanacon.26',
+      image: memberPhoto('古山 菜々美.jpg')
     },
     {
       number: '07',
@@ -416,7 +444,8 @@ export default function TryVII_LP() {
         { title: 'STYLE', detail: 'ホワイト×シルバーフリル' }
       ],
       hashtags: ['#TsukimiMoon', '#LunarSilk', '#TryVII'],
-      tiktok: 'https://www.tiktok.com/@tamaconnyapi'
+      tiktok: 'https://www.tiktok.com/@tamaconnyapi',
+      image: memberPhoto('楠 つきみ.jpg')
     }
   ];
 
@@ -467,6 +496,8 @@ export default function TryVII_LP() {
     }
   ];
 
+  const nextEvent = scheduleData[0];
+
   return (
     <div className="font-['Poppins','Noto Sans JP',sans-serif] text-gray-800 bg-gradient-to-b from-[#fef6ff] via-[#f2f7ff] to-white min-h-screen selection:bg-pink-200">
       {/* Navigation */}
@@ -505,14 +536,13 @@ export default function TryVII_LP() {
       </nav>
 
       {/* Hero */}
-      <header className="relative h-screen flex items-center justify-center overflow-hidden">
+      <header className="relative min-h-screen flex items-center overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-[#0c0119] via-[#120a33] to-[#040108]"></div>
         <div className="absolute inset-0 opacity-40">
           <div className="absolute w-[500px] h-[500px] bg-pink-500/40 rounded-full blur-3xl top-1/4 left-1/5 animate-blob"></div>
           <div className="absolute w-[520px] h-[520px] bg-purple-500/40 rounded-full blur-3xl bottom-1/4 right-1/5 animate-blob animation-delay-2000"></div>
           <div className="absolute inset-0 bg-[radial-gradient(circle,_rgba(255,255,255,0.1)_0%,_transparent_65%)]"></div>
         </div>
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80')] bg-cover bg-center opacity-10 mix-blend-screen"></div>
         <div className="absolute inset-0 pointer-events-none">
           {[...Array(30)].map((_, i) => (
             <div
@@ -526,33 +556,65 @@ export default function TryVII_LP() {
             ></div>
           ))}
         </div>
-        <div className="relative z-10 text-center px-6">
-          <p className="text-white/70 text-xs md:text-sm font-semibold tracking-[0.8em] mb-6">TIKTOK ORIGIN IDOL PROJECT</p>
-          <h1 className="text-5xl md:text-8xl font-black text-white mb-4 tracking-tight drop-shadow-2xl">
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-pink-200 via-white to-blue-200">TryVII</span>
-          </h1>
-          <p className="text-white text-lg md:text-2xl font-semibold tracking-[0.35em]">TRY TOGETHER, WIN AS VII</p>
-          <p className="text-white/80 text-sm md:text-base mt-6 max-w-2xl mx-auto leading-relaxed">
-            TikTok発、７色の挑戦。世界へ飛び出すデジタルネイティブアイドルがここに誕生。
-          </p>
-          <div className="flex flex-wrap justify-center gap-4 mt-10">
-            <a
-              href="https://www.tiktok.com/@tryvii_official"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-8 py-3 rounded-full bg-gradient-to-r from-pink-500 to-blue-500 text-white font-bold flex items-center gap-2 shadow-xl"
-            >
-              <TikTokIcon className="w-5 h-5" />
-              Follow Group TikTok
-            </a>
-            <a
-              href="#members"
-              className="px-8 py-3 rounded-full bg-white/20 text-white font-bold border border-white/40 backdrop-blur-sm"
-            >
-              Meet The Members
-            </a>
+        <div className="relative z-10 w-full">
+          <div className="max-w-6xl mx-auto px-6 grid lg:grid-cols-[1.05fr_0.95fr] gap-12 items-center">
+            <div className="text-center lg:text-left">
+              <div className="flex items-center justify-center lg:justify-start gap-3 text-white/70 text-xs font-semibold tracking-[0.6em] mb-6">
+                <Radio className="w-4 h-4" />
+                TIKTOK ORIGIN IDOL PROJECT
+              </div>
+              <h1 className="text-5xl md:text-8xl font-black text-white mb-4 tracking-tight drop-shadow-2xl">
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-pink-200 via-white to-blue-200">TryVII</span>
+              </h1>
+              <p className="text-white text-lg md:text-2xl font-semibold tracking-[0.35em]">TRY TOGETHER, WIN AS VII</p>
+              <p className="text-white/80 text-sm md:text-base mt-6 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
+                TikTok発、７色の挑戦。世界へ飛び出すデジタルネイティブアイドルがここに誕生。
+              </p>
+              {nextEvent && (
+                <div className="mt-6 inline-flex items-center gap-3 px-5 py-3 rounded-full bg-white/10 text-white/80 text-xs font-semibold tracking-[0.3em] border border-white/20">
+                  <Calendar className="w-4 h-4" />
+                  NEXT LIVE {nextEvent.date} ({nextEvent.day})
+                </div>
+              )}
+              <div className="flex flex-wrap justify-center lg:justify-start gap-4 mt-10">
+                <a
+                  href="https://www.tiktok.com/@tryvii_official"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-8 py-3 rounded-full bg-gradient-to-r from-pink-500 to-blue-500 text-white font-bold flex items-center gap-2 shadow-xl"
+                >
+                  <TikTokIcon className="w-5 h-5" />
+                  Follow Group TikTok
+                </a>
+                <a
+                  href="#members"
+                  className="px-8 py-3 rounded-full bg-white/20 text-white font-bold border border-white/40 backdrop-blur-sm"
+                >
+                  Meet The Members
+                </a>
+              </div>
+              <div className="mt-16 hidden lg:flex items-center gap-2 text-white/60 text-xs tracking-[0.35em]">
+                <Sparkles className="w-4 h-4" />
+                2025.02 DEBUT VISUAL FIRST CUT
+              </div>
+            </div>
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-pink-500/30 to-blue-500/30 blur-3xl"></div>
+              <div className="relative rounded-[40px] overflow-hidden border border-white/20 shadow-2xl">
+                <img
+                  src={heroGroupPhoto}
+                  alt="TryVII 集合写真"
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
+                <div className="absolute bottom-5 left-6 right-6 text-white flex items-center justify-between text-xs tracking-[0.35em]">
+                  <span>TRYVII FIRST VIEW</span>
+                  <span>2025 VISUAL</span>
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="mt-20 animate-bounce">
+          <div className="mt-12 animate-bounce">
             <ChevronDown className="text-white/50 mx-auto w-10 h-10" />
           </div>
         </div>
